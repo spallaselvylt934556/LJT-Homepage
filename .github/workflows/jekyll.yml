@@ -4,6 +4,11 @@ on:
   push:
     branches: [master]
   workflow_dispatch:
+    inputs:
+      verify_only:
+        description: 'Build and verify without deploying'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,14 +34,23 @@ jobs:
           cache-version: 0
       - uses: actions/configure-pages@v6.0.0
         id: pages
+        if: ${{ !inputs.verify_only }}
         with:
           enablement: true
       - name: Build with Jekyll
-        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        run: bundle exec jekyll build
         env:
           JEKYLL_ENV: production
       - uses: actions/upload-pages-artifact@v5.0.0
+        if: ${{ !inputs.verify_only }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.verify_only }}
+        with:
+          name: homepage-static-build
+          path: _site/
+          retention-days: 1
   deploy:
+    if: ${{ !inputs.verify_only }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
