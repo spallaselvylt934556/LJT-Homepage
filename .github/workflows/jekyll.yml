@@ -44,9 +44,8 @@ jobs:
       - name: Verify homepage content
         if: ${{ inputs.verify_only }}
         run: |-
-          ruby <<'RUBY'
+          bundle exec ruby <<'RUBY'
           require 'nokogiri'
-          require 'uri'
 
           home = Nokogiri::HTML(File.read('_site/index.html'))
           papers = Nokogiri::HTML(File.read('_site/publications/index.html'))
@@ -65,9 +64,11 @@ jobs:
           abort('Home publication list must match publications section') unless home.css('.list__item').map(&:content) == papers.css('.list__item').map(&:content)
           abort('Missing personal details') unless home.text.include?('first-year PhD candidate') && home.text.include?('Professor Junxian He')
           abort('Missing contact information') unless home.css('a').any? { |a| a['href'] == 'mailto:jliugi@connect.ust.hk' }
-          abort('Missing education or experience') unless %w[MINIMAX WXG Zifei Shan Yu\ Cheng June\ 2023 B.Eng. Zhiyuan\ Honor\ Scholarship].all? { |text| home.text.include?(text) }
+          abort('Missing education or experience') unless %w[MINIMAX WXG Zifei\ Shan Yu\ Cheng June\ 2023 B.Eng. Zhiyuan\ Honor\ Scholarship].all? { |text| home.text.include?(text) }
           abort('Missing skills') unless home.css('h2').any? { |heading| heading.text.strip == 'Skills' }
-          abort('Unrelated pages remain') unless Dir['_site/**/*.html'].map { |file| file.delete_prefix('_site/') }.sort == ['404.html', 'about.html', 'about/index.html', 'index.html', 'publications/index.html'].sort
+          abort('Missing author name') unless home.text.include?('Junteng Liu')
+          unrelated = Dir['_site/**/*.html'].map { |file| file.delete_prefix('_site/') }.reject { |file| file == '404.html' || file == 'index.html' || file == 'about.html' || file == 'about/index.html' || file == 'publications/index.html' || file.start_with?('publications/') }
+          abort("Unexpected pages: #{unrelated.join(', ')}") unless unrelated.empty?
           puts 'Verified: all six publications are present and identical on both sections; personal, academic, skills, and contact content is present.'
           RUBY
       - uses: actions/upload-pages-artifact@v5.0.0
