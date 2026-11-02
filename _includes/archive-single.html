@@ -1,14 +1,14 @@
-{% include base_path %}
-
 <div class="list__item">
-  <article class="archive__item" itemscope itemtype="http://schema.org/ScholarlyArticle">
-    <h2 class="archive__item-title" itemprop="headline">{{ post.title | markdownify | remove: "<p>" | remove: "</p>" }}</h2>
+  <article class="archive__item">
+    <h2 class="archive__item-title">{{ post.title | markdownify | remove: "<p>" | remove: "</p>" }}</h2>
     {% if post.excerpt %}
-      <div class="archive__item-excerpt" itemprop="description">{{ post.excerpt | markdownify }}</div>
+      <p class="archive__item-excerpt">{{ post.excerpt | markdownify | remove: "<p>" | remove: "</p>" }}</p>
     {% endif %}
     <p class="publication-details">{{ post.venue | default: post.publication_type }} &middot; {{ post.date | date: "%Y" }}</p>
     {% if post.github_repo %}
       <p class="publication-code">Code repository: {{ post.github_repo }}</p>
+    {% elsif post.github_repository_available %}
+      <p class="publication-code">GitHub code repository available.</p>
     {% endif %}
   </article>
 </div>
