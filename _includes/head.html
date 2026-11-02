@@ -1,16 +1,10 @@
 {% include base_path %}
 
 <meta charset="utf-8">
-
-{% include seo.html %}
-
-<link href="{% if site.atom_feed.path %}{{ site.atom_feed.path }}{% else %}{{ base_path }}/feed.xml{% endif %}" type="application/atom+xml" rel="alternate" title="{{ site.title }} Feed">
-
+<title>{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title | escape }}{% endif %}</title>
+<meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | escape }}{% else %}{{ site.description | escape }}{% endif %}">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<script>
-  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
-</script>
-
-<!-- For all browsers -->
+<meta name="author" content="{{ site.author.name }}">
+<script>document.documentElement.className += ' js';</script>
 <link rel="stylesheet" href="{{ base_path }}/assets/css/main.css">
+<link rel="icon" type="image/svg+xml" href="{{ base_path }}/images/favicon.svg">
